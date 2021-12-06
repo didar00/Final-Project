@@ -10,6 +10,8 @@ from transformers import RobertaConfig
 from transformers import RobertaForMaskedLM
 from transformers import RobertaTokenizerFast
 
+from torch.nn.parallel import DistributedDataParallel
+
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from accelerate import Accelerator
@@ -70,6 +72,9 @@ eval_dataloader = DataLoader(
 
 #Model
 
+local_rank = int(os.environ.get("LOCAL_RANK", -1))
+device = accelerator.device
+
 config = RobertaConfig(
     vocab_size=8192,
     max_position_embeddings=514,
@@ -78,7 +83,8 @@ config = RobertaConfig(
     type_vocab_size=1,
 )
 
-model = RobertaForMaskedLM(config=config)
+model = RobertaForMaskedLM(config=config).to(device)
+model = DistributedDataParallel(model)
 
 print(torch.cuda.is_available())
 
