@@ -1,2 +1,3 @@
 # Final-Project
-test
+
+main.py üzerinden takip edebilirsiniz.
