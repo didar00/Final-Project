@@ -81,9 +81,20 @@ def train_and_save_roberta_model(hyperparameters_dict, selfies_path="./data/self
         eval_dataset=eval_dataset,
         #prediction_loss_only=True,
     )
+
+    from ray import tune
+    # the number of gpus
+    # that will be used can be
+    # either stated in command line
+    # or in parameters
+    trainer.hyperparameter_search(
+        direction="maximize", 
+        backend="ray", 
+        n_trials=10 # number of trials
+    )
     
     print(torch.cuda.is_available())
-    torch.cuda.set_device(0)
+    #torch.cuda.set_device(0)
     print(torch.cuda.current_device())
     print("build trainer with on device:", training_args.device, "with n gpus:", training_args.n_gpu)
     #torch.cuda.set_per_process_memory_fraction(0.3) # limit VRAM usage

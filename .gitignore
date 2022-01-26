@@ -9,4 +9,3 @@ chembl_29_selfies_alphabet.txt
 chembl_29_selfies.csv
 selfies_subset.txt
 hyperparameter_tuning.py
-hyper_test.py
