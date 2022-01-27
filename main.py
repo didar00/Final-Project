@@ -1,5 +1,5 @@
 import pandas as pd
-try:
+""" try:
 	chembl_df = pd.read_csv("./data/chembl_29_selfies.csv")
 except FileNotFoundError:
 	import prepare_data
@@ -23,7 +23,7 @@ bpe_tokenizer.bpe_tokenizer(path="./data/selfies_subset.txt", save_to="./data/bp
 
 import roberta_tokenizer
 roberta_tokenizer.save_roberta_tokenizer(path="./data/bpe/", save_to="./data/robertatokenizer/")
-
+ """
 # call the new file to find the hyperparameter
 # configuration which saves the relevant
 # configuration to a yml file
