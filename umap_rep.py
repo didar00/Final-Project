@@ -1,9 +1,10 @@
 #Get Data
 import pandas as pd
 import numpy as np
-chembl_df= pd.read_csv("demo2.csv", delimiter=";")
+chembl_df= pd.read_csv("ATC_selfies.csv", delimiter=",")
 selfies_df = chembl_df["Selfies"]
-class_df = chembl_df["Class"]
+class_df = chembl_df["ATC Code"]
+
 
 #Get Vectors Hidden and Sequence
 from transformers import RobertaTokenizer, RobertaModel, RobertaConfig
