@@ -69,10 +69,12 @@ Hiddens_arr = np.array(Hiddens)
 #Umap Representation
 import umap.umap_ as umap
 import umap.plot
-mapper = umap.UMAP(random_state=123).fit(Hiddens_arr) #the clustering and values will be different, to keep the same graph set the common seed
+mapper = umap.UMAP().fit(Hiddens_arr) #the clustering and values will be different, to keep the same graph set the common seed, random_state=123
 umap_p = umap.plot.points(mapper, labels=Class_arr)
+umap.plot.plt.savefig("Hiddens.png")
 umap.plot.show(umap_p)
 
-mapper = umap.UMAP(random_state=123).fit(Seqs_arr)
+mapper = umap.UMAP().fit(Seqs_arr)
 umap_p = umap.plot.points(mapper, labels=Class_arr)
+umap.plot.plt.savefig("Seqs.png")
 umap.plot.show(umap_p)
