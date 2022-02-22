@@ -75,4 +75,4 @@ umap.plot.show(umap_p)
 
 mapper = umap.UMAP(random_state=123).fit(Seqs_arr)
 umap_p = umap.plot.points(mapper, labels=Class_arr)
-umap.plot.plt.show(umap_p)
+umap.plot.show(umap_p)
