@@ -176,22 +176,7 @@ print("Metrics")
 print(metrics)
 trainer.save_model(save_to)
 
-"""
-# Load trained model
-model_path = save_to
-model_t = RobertaForSelfiesClassification.from_pretrained(model_path, num_labels=2)
-
-# Define test trainer
-test_trainer = Trainer(model_t, compute_metrics=compute_metrics)
-
-
-#Test
-print("\nTesting")
-metrics = test_trainer.evaluate(test_dataset)
-print("Metrics")
-print(metrics)
-
-"""
+#Testing
 # Make prediction
 raw_pred, label_ids, metrics = trainer.predict(test_dataset)
 
