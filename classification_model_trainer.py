@@ -27,7 +27,7 @@ from transformers.models.roberta.modeling_roberta import (
 
 
 save_to="./saved_classification_model/"
-#Model
+# Model
 class RobertaForSelfiesClassification(BertPreTrainedModel):
     
     def __init__(self, config):
@@ -64,7 +64,7 @@ num_labels = 2 #set it to 1 for regression
 #device = torch.device("cuda")
 tokenizer_name = './robertatokenizer'
 
-#Configs
+# Configs
 
 config_class = RobertaConfig
 model_class = RobertaForSelfiesClassification
@@ -78,7 +78,7 @@ model = model_class.from_pretrained(model_name, config=config)
 tokenizer = tokenizer_class.from_pretrained(tokenizer_name, do_lower_case=False)
 #print('Tokenizer=',tokenizer,'\n')
 
-#Prepare and Get Data
+# Prepare and Get Data
 
 class MyClassificationDataset(Dataset):
     
@@ -114,7 +114,7 @@ test_examples = (test_df.iloc[:, 0].astype(str).tolist(), test_df.iloc[:, 1].tol
 test_dataset = MyClassificationDataset(test_examples,tokenizer, MAX_LEN)
 
 
-#Train and Evaluate
+# Train and Evaluate
 from transformers import TrainingArguments, Trainer
 from datasets import load_metric
 from sklearn.metrics import roc_auc_score
@@ -176,7 +176,7 @@ print("Metrics")
 print(metrics)
 trainer.save_model(save_to)
 
-#Testing
+# Testing
 # Make prediction
 raw_pred, label_ids, metrics = trainer.predict(test_dataset)
 
