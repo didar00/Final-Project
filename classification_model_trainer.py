@@ -60,7 +60,7 @@ class RobertaForSelfiesClassification(BertPreTrainedModel):
 
 
 model_name = './chemberta_saved_model/model'
-num_labels = 2
+num_labels = 2 #set it to 1 for regression
 #device = torch.device("cuda")
 tokenizer_name = './robertatokenizer'
 
