@@ -1,7 +1,9 @@
 import torch
 from torch.utils.data.dataset import Dataset
 import tensorflow as tf
-
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
 
 class CustomDataset(Dataset):
     def __init__(self, df, tokenizer, MAX_LEN):
@@ -32,21 +34,14 @@ import math
 
 from ray import tune
 def get_hyper_dict(trial):
-    """
-    All of these parameters' name must
-    be compatible with TrainingArguments'
-    hyperparameter names
-    """
-    # all values have been set to one possible conf.
-    # due to the memory error
-    # but it STILL gives memory error
     hp = {
-        "per_device_train_batch_size": tune.grid_search([8]),
-        "per_device_eval_batch_size": tune.grid_search([8]),
-        "learning_rate":tune.grid_search([0.001]),
-        "weight_decay": tune.grid_search([0.01]),
+        "per_device_train_batch_size": tune.grid_search([8, 16, 32]),
+        "per_device_eval_batch_size": tune.grid_search([8, 16]),
+        "learning_rate":tune.grid_search([0.0001, 0.001, 0.01]),
+        "weight_decay": tune.grid_search([0.001, 0.01, 0.1])
     }
     return hp
+
 
 def train_and_save_roberta_model(hyperparameters_dict, selfies_path="./data/selfies_subset.txt", robertatokenizer_path="./data/robertatokenizer/", save_to="./saved_model/"):
     TRAIN_BATCH_SIZE = hyperparameters_dict["TRAIN_BATCH_SIZE"]
@@ -91,8 +86,8 @@ def train_and_save_roberta_model(hyperparameters_dict, selfies_path="./data/self
         per_device_eval_batch_size=VALID_BATCH_SIZE,
         save_steps=8192,
         eval_steps=4096,
-        save_total_limit=1
-        #fp16=True,
+        save_total_limit=1,
+        fp16=True
     )
 
     trainer = Trainer(
@@ -110,25 +105,24 @@ def train_and_save_roberta_model(hyperparameters_dict, selfies_path="./data/self
     # that will be used can be
     # either stated in command line
     # or in parameters
-    
-    tf.compat.v1.disable_eager_execution() # this line should've been enough to solve it, but nah
-    trainer.hyperparameter_search(
+    tf.compat.v1.disable_eager_execution()
+    res = trainer.hyperparameter_search(
         hp_space=get_hyper_dict,
         direction="maximize", 
         backend="ray", 
-        n_trials=1 # number of trials
+        n_trials=1, # number of trials
+        resources_per_trial={"gpu": 1}
     )
+    print("Result is:", res)
     
     
-    """
-    print(torch.cuda.is_available())
+    """ print(torch.cuda.is_available())
     #torch.cuda.set_device(0)
     print(torch.cuda.current_device())
     print("build trainer with on device:", training_args.device, "with n gpus:", training_args.n_gpu)
     #torch.cuda.set_per_process_memory_fraction(0.3) # limit VRAM usage
     print(torch.cuda.list_gpu_processes())
     """
-
     """ trainer.train()
 
     eval_results = trainer.evaluate()
