@@ -60,10 +60,10 @@ class RobertaForSelfiesClassification(BertPreTrainedModel):
         return outputs  # (loss), logits, (hidden_states), (attentions)
 
 
-model_name = './chemberta_saved_model/model'
+model_name = './default_saved_model/checkpoint-2605600'
 num_labels = 2 #set it to 1 for regression
 #device = torch.device("cuda")
-tokenizer_name = './robertatokenizer'
+tokenizer_name = './data/robertatokenizer'
 
 # Configs
 
@@ -106,8 +106,7 @@ import chemprop_test
 import argparse
 
 # Parse command line arguments
-parser = argparse.ArgumentParser(
-    description='Train Mask R-CNN to detect foods on breakfast plate.')
+parser = argparse.ArgumentParser()
 parser.add_argument("command",
                     metavar="<command>",
                     help="'regression' or 'classification'")
@@ -116,8 +115,9 @@ parser.add_argument('--dataset', required=False,
                     help='Directory of the dataset')
 
 args = parser.parse_args()
-
-DATASET_PATH = os.path.join("chemprop_data", args.command, args.dataset)
+import os
+DATASET_PATH = os.path.join("chemprop_selfies_data", args.command, args.dataset)
+print("DATASET PATH: ", DATASET_PATH)
 (train, val, test) = chemprop_test.split_data(DATASET_PATH)
 
 train_df = pd.DataFrame (train.smiles(), train.targets(), columns = ['smiles', 'target'])
