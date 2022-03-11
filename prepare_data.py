@@ -17,3 +17,16 @@ def prepare_data(path="data/chembl_29_chemreps.txt", save_to="./data/chembl_29_s
 	chembl_df.to_csv(save_to, index=False)
 
 	print(".csv file saved to: " + save_to)
+
+def smiles_to_selfies(df, out_file):
+	df["selfies"] = df["smiles"]
+	pandarallel.initialize()
+	df.selfies = df.selfies.parallel_apply(to_selfies.to_selfies)
+
+	df.drop(df[df.smiles == df.selfies].index, inplace=True)
+	df.drop(columns=["smiles"], inplace=True)
+	df = df[["selfies", "target"]]
+	df.to_csv(out_file, index=False)
+
+	print(".csv file saved to: " + out_file)
+	return df

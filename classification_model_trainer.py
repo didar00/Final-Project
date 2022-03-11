@@ -1,3 +1,12 @@
+"""
+TO RUN THIS FILE
+
+python classification_model_trainer.py classification --dataset=bbbp.csv
+
+
+"""
+
+
 from ast import arg
 import os
 import numpy as np
@@ -60,7 +69,7 @@ class RobertaForSelfiesClassification(BertPreTrainedModel):
         return outputs  # (loss), logits, (hidden_states), (attentions)
 
 
-model_name = './default_saved_model/checkpoint-2605600'
+model_name = './default_saved_model/checkpoint-49152'
 num_labels = 2 #set it to 1 for regression
 #device = torch.device("cuda")
 tokenizer_name = './data/robertatokenizer'
@@ -116,19 +125,44 @@ parser.add_argument('--dataset', required=False,
 
 args = parser.parse_args()
 import os
-DATASET_PATH = os.path.join("chemprop_selfies_data", args.command, args.dataset)
-print("DATASET PATH: ", DATASET_PATH)
-(train, val, test) = chemprop_test.split_data(DATASET_PATH)
+from prepare_data import smiles_to_selfies
+import numpy as np
 
-train_df = pd.DataFrame (train.smiles(), train.targets(), columns = ['smiles', 'target'])
-validation_df = pd.DataFrame (val.smiles(), val.targets(), columns = ['smiles', 'target'])
-test_df = pd.DataFrame (test.smiles(), test.targets(), columns = ['smiles', 'target'])
-test_y = pd.DataFrame (test.targets(), columns = ['target'])
+# get the SMILES data from the input file
+DATASET_PATH = os.path.join("chemprop_data", args.command, args.dataset)
+SPLIT_DATA_PATH = "./dataframes"
+print("SMILES DATASET PATH: ", DATASET_PATH)
 
-""" train_df = pd.read_csv("ATC/ATC.csv", delimiter=";")[:15]
-validation_df = pd.read_csv("ATC/ATC.csv", delimiter=";")[16:26]
-test_df = pd.read_csv("ATC/ATC.csv", delimiter=";")[27:37]
-test_y = pd.read_csv("ATC/ATC.csv", delimiter=";")["Label"][27:37] """
+# check if the directory for dataframes already exist
+if not os.path.exists(SPLIT_DATA_PATH):
+    # create a new directory
+    os.makedirs(SPLIT_DATA_PATH)
+
+files = os.listdir(SPLIT_DATA_PATH)
+# check if the files already exist (csv files for train-validation-test)
+if "train_df.csv" in files and "validation_df.csv" in files and "test_df.csv" in files:
+    train_df = pd.read_csv(os.path.join(SPLIT_DATA_PATH, "train_df.csv"), sep=",")
+    validation_df = pd.read_csv(os.path.join(SPLIT_DATA_PATH, "validation_df.csv"), sep=",")
+    test_df = pd.read_csv(os.path.join(SPLIT_DATA_PATH, "test_df.csv"), sep=",")
+    test_y = pd.DataFrame (test_df.target, columns = ['target'])
+else:
+    # split data
+    (train, val, test) = chemprop_test.split_data(DATASET_PATH)
+
+    train_smiles = [item[0] for item in train.smiles()]
+    validation_smiles = [item[0] for item in val.smiles()]
+    test_smiles = [item[0] for item in test.smiles()]
+    
+    train_df = pd.DataFrame(np.column_stack([train_smiles, train.targets()]), columns = ['smiles', 'target'])
+    validation_df = pd.DataFrame(np.column_stack([validation_smiles, val.targets()]), columns = ['smiles', 'target'])
+    test_df = pd.DataFrame(np.column_stack([test_smiles, test.targets()]), columns = ['smiles', 'target'])
+
+    # convert dataframes to SELFIES representation
+    train_df = smiles_to_selfies(train_df, os.path.join(SPLIT_DATA_PATH,"train_df.csv"))
+    validation_df = smiles_to_selfies(validation_df, os.path.join(SPLIT_DATA_PATH,"validation_df.csv"))
+    test_df = smiles_to_selfies(test_df, os.path.join(SPLIT_DATA_PATH,"test_df.csv"))
+    test_y = test_df.target
+
 
 MAX_LEN = 128 
 train_examples = (train_df.iloc[:, 0].astype(str).tolist(), train_df.iloc[:, 1].tolist())
