@@ -13,6 +13,12 @@ import numpy as np
 import pandas as pd
 import transformers
 import torch
+
+import chemprop_multitransform
+import argparse
+import os
+from prepare_data import smiles_to_selfies
+
 from torch.utils.data import (
     Dataset
 )
@@ -110,9 +116,7 @@ class MyClassificationDataset(Dataset):
 
 
 
-import pandas as pd
-import chemprop_test
-import argparse
+
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
@@ -124,9 +128,7 @@ parser.add_argument('--dataset', required=False,
                     help='Directory of the dataset')
 
 args = parser.parse_args()
-import os
-from prepare_data import smiles_to_selfies
-import numpy as np
+
 
 # get the SMILES data from the input file
 DATASET_PATH = os.path.join("chemprop_data", args.command, args.dataset)
@@ -147,7 +149,7 @@ if "train_df.csv" in files and "validation_df.csv" in files and "test_df.csv" in
     test_y = pd.DataFrame (test_df.target, columns = ['target'])
 else:
     # split data
-    (train, val, test) = chemprop_test.split_data(DATASET_PATH)
+    (train, val, test) = chemprop_multitransform.split_data(DATASET_PATH)
 
     train_smiles = [item[0] for item in train.smiles()]
     validation_smiles = [item[0] for item in val.smiles()]
