@@ -34,8 +34,8 @@ for selfies,ids in zip(selfies_df,ids_df):
 
         sequence_output = output[0]
         #Embeds.append(embedding_output.detach().numpy())
-        Hiddens.append(hidden_output)#.reshape(-1, 1)) #Tensor that requires grad therefore use detach
-        Seqs.append(sequence_output)#.reshape(-1, 1)) #(1,token size,768) to (768,)
+        Hiddens.append(hidden_output.detach())#.reshape(-1, 1)) #Tensor that requires grad therefore use detach
+        Seqs.append(sequence_output.detach())#.reshape(-1, 1)) #(1,token size,768) to (768,)
         print(np.mean(sequence_output.detach().numpy()[0], axis=0).shape)
         Ids.append(ids)
     except:
