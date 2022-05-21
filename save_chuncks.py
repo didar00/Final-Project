@@ -39,8 +39,8 @@ def embeds(chem_list, num, tok, model):
 
             sequence_output = output[0]
             #Embeds.append(embedding_output.detach().numpy())
-            Hiddens.append(hidden_output.detach())#.reshape(-1, 1)) #Tensor that requires grad therefore use detach
-            Seqs.append(sequence_output.detach())#.reshape(-1, 1)) #(1,token size,768) to (768,)
+            Hiddens.append(hidden_output.detach().numpy())#.reshape(-1, 1)) #Tensor that requires grad therefore use detach
+            Seqs.append(sequence_output.detach().numpy())#.reshape(-1, 1)) #(1,token size,768) to (768,)
             #print(np.mean(sequence_output.detach().numpy()[0], axis=0).shape)
             Ids.append(ids)
 
@@ -50,24 +50,24 @@ def embeds(chem_list, num, tok, model):
             #Do Nothing if Fails
             continue
 
-    Seqs_arr = np.array(Seqs)
-    Ids_arr = np.array(Ids)
-    Hiddens_arr = np.array(Hiddens)
+    #Seqs_arr = np.array(Seqs)
+    #Ids_arr = np.array(Ids)
+    #Hiddens_arr = np.array(Hiddens)
     #print(Seqs[0],Seqs_arr[0].shape,Hiddens_arr[0].shape)
     
     if(len(Ids) != 0):
 
-        data_s = {'chembl_id':Ids_arr,
-                'embeddings':Seqs_arr}
+        data_s = {'chembl_id':Ids,
+                'embeddings':Seqs}
   
         df = pd.DataFrame(data_s)
-        df.to_csv('./Sequence_output/sequence_output_embeddings_part_%s.csv' % num, index=False)
+        df.to_csv('./Sequence_output/sequence_output_embeddings_part_%s.csv' % num, index=False) 
 
-        data_h = {'chembl_id':Ids_arr,
-                'embeddings':Hiddens_arr}
+        data_h = {'chembl_id':Ids,
+                'embeddings':Hiddens}
   
         df_2 = pd.DataFrame(data_h)
-        df_2.to_csv('./Hidden_states_output/hidden_states_embeddings_part_%s.csv' % num, index=False)
+        df_2.to_csv('./Hidden_states_output/hidden_states_embeddings_part_%s.csv' % num, index=False) 
         
         #with open('./Sequence_output/sequence_output_embeddings_part_%s.pkl' % num, "wb") as fOut:
             #pickle.dump({'chembl_id': Ids, 'sequence_output_embeddings': Seqs}, fOut, protocol=pickle.HIGHEST_PROTOCOL)
@@ -95,12 +95,12 @@ if __name__ == "__main__":
     tok = RobertaTokenizer.from_pretrained("./robertatokenizer")
     model = RobertaModel.from_pretrained(model_name, config=config)
 
-    #chems= pd.read_csv("chembl_29_selfies.csv", delimiter=",")[:5]
+    chems= pd.read_csv("chembl_29_selfies.csv", delimiter=",")[:5]
     
-    #chem_chunks = chunks(chems,25000)
+    chem_chunks = chunks(chems,25000)
 
     number=1
-    for chem in pd.read_csv("chembl_29_selfies.csv", delimiter=",", chunksize=25000):
+    for chem in chem_chunks:#pd.read_csv("chembl_29_selfies.csv", delimiter=",", chunksize=25000):
 
         check = embeds(chem,number,tok,model)
         if (check==True):
@@ -118,9 +118,3 @@ if __name__ == "__main__":
 #print(seqsofchembs[0],Seqs_arr[0])
 
 
-
-
-    
-    
-
-   
