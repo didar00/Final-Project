@@ -95,12 +95,12 @@ if __name__ == "__main__":
     tok = RobertaTokenizer.from_pretrained("./robertatokenizer")
     model = RobertaModel.from_pretrained(model_name, config=config)
 
-    chems= pd.read_csv("chembl_29_selfies.csv", delimiter=",")[:5]
+    #chems= pd.read_csv("chembl_29_selfies.csv", delimiter=",")[:5]
     
-    chem_chunks = chunks(chems,25000)
+    #chem_chunks = chunks(chems,25000)
 
     number=1
-    for chem in chem_chunks:#pd.read_csv("chembl_29_selfies.csv", delimiter=",", chunksize=25000):
+    for chem in pd.read_csv("chembl_29_selfies.csv", delimiter=",", chunksize=25000):
 
         check = embeds(chem,number,tok,model)
         if (check==True):
